@@ -1,16 +1,23 @@
 {
-  "name": "react-data-segment",
+  "name": "react-grain-state",
   "version": "1.0.0",
-  "description": "Lightweight + Fine-grained state management for large data structures in React.",
+  "description": "Fine-grained and performant state management for large data structures in React.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.js --dts --format esm,cjs"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "react",
+    "state",
+    "management",
+    "hooks",
+    "nested-state",
+    "fine-grained-updates"
+  ],
+  "author": "Ty Crockett",
+  "license": "MIT",
   "devDependencies": {
     "react": "^18.3.1",
     "tsup": "^8.3.5",
