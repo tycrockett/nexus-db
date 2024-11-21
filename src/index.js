@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import * as uuid from "uuid";
 
 const createSelector = (path) => {
   const selector = (obj) => path.reduce((acc, key) => acc?.[key], obj);
   selector.path = path;
-  selector.id = uuid.v4();
   selector.pathKey = path.join(".");
   return selector;
 };
@@ -89,21 +87,22 @@ class ListenerTree {
   }
 }
 
-export const useData = (initialData) => {
-  const data = useRef(initialData).current;
+export const useGrainState = (initialData) => {
+  const stateRef = useRef(initialData);
   const listeners = useRef(new ListenerTree());
+  const state = stateRef.current;
 
-  const setData = (valueOrFunction) => {
+  const setState = (valueOrFunction) => {
     if (typeof valueOrFunction === "function") {
-      data = valueOrFunction(data);
+      stateRef.current = valueOrFunction(state);
     } else {
-      data = valueOrFunction;
+      stateRef.current = valueOrFunction;
     }
     listeners.current.notify([]);
   };
 
-  const setDataWithSelector = (selector, newValue) => {
-    dataSetter(data, selector, newValue);
+  const setStateWithSelector = (selector, newValue) => {
+    dataSetter(state, selector, newValue);
     listeners.current.notify(selector.path);
   };
 
@@ -116,25 +115,25 @@ export const useData = (initialData) => {
   };
 
   return {
-    current: data,
-    setData,
+    current: state,
+    setState,
     segment: {
-      setDataWithSelector,
+      setStateWithSelector,
       addListener,
       removeListener,
     },
   };
 };
 
-export const useSegment = (state, path, options = {}) => {
+export const useGrain = (state, path, options = {}) => {
   const { detach = false } = options;
   const selector = useRef(createSelector(path)).current;
-  const [data, setData] = useState(() => selector(state.current));
+  const [data, setState] = useState(() => selector(state.current));
 
   useEffect(() => {
     const updateListener = () => {
       if (!detach) {
-        setData(selector(state.current));
+        setState(selector(state.current));
       }
     };
 
@@ -145,8 +144,8 @@ export const useSegment = (state, path, options = {}) => {
   }, []);
 
   const setter = (newValue) => {
-    setData(newValue);
-    state.segment.setDataWithSelector(selector, newValue);
+    setState(newValue);
+    state.segment.setStateWithSelector(selector, newValue);
   };
 
   return [data, setter];
