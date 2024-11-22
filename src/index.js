@@ -115,7 +115,7 @@ export const useNexus = (initialData) => {
     setStateSetAt(Date.now());
   };
 
-  const setStateWithSelector = (selector, newValue) => {
+  const setNexusWithSelector = (selector, newValue) => {
     dataSetter(state, selector, newValue);
     listeners.current.notify(selector.path);
   };
@@ -134,7 +134,7 @@ export const useNexus = (initialData) => {
     set: setState,
     stateSetAt,
     link: {
-      setStateWithSelector,
+      setNexusWithSelector,
       addListener,
       removeListener,
     },
@@ -171,7 +171,7 @@ export const useLink = (state, path, options = {}) => {
   const setter = (newValue) => {
     setState(newValue);
     if (!detach) {
-      state.link.setStateWithSelector(selector, newValue);
+      state.link.setNexusWithSelector(selector, newValue);
     }
   };
 
@@ -184,7 +184,7 @@ export const useLink = (state, path, options = {}) => {
 
 export const propagateLink = (state, link) => {
   const { data, selector } = link;
-  state.link.setStateWithSelector(selector, data);
+  state.link.setNexusWithSelector(selector, data);
 };
 
 export const syncLink = (state, link) => {
