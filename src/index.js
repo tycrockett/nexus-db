@@ -159,6 +159,8 @@ export const useLink = (state, path, options = {}) => {
   const selector = useRef(createSelector(path)).current;
   const [data, setData] = useState();
 
+  console.log(data);
+
   const setter = (newValue) => {
     setData(newValue);
     if (!stopPropagation) {
@@ -169,6 +171,7 @@ export const useLink = (state, path, options = {}) => {
   const updateLinkFromNexus = () => {
     if (!disableSync) {
       const data = selector(state.current);
+      console.log("test", data);
       setData(data);
     }
   };
