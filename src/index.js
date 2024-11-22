@@ -104,7 +104,7 @@ export const useNexus = (initialData) => {
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
-  const [stateSetAt, setStateSetAt] = useState(Date.now());
+  const [nexusSetAt, setNexusAt] = useState(Date.now());
 
   const setState = (valueOrFunction) => {
     if (typeof valueOrFunction === "function") {
@@ -112,7 +112,7 @@ export const useNexus = (initialData) => {
     } else {
       stateRef.current = valueOrFunction;
     }
-    setStateSetAt(Date.now());
+    setNexusAt(Date.now());
   };
 
   const setNexusWithSelector = (selector, newValue) => {
@@ -132,7 +132,7 @@ export const useNexus = (initialData) => {
   return {
     current: state,
     set: setState,
-    stateSetAt,
+    nexusSetAt,
     link: {
       setNexusWithSelector,
       addListener,
@@ -144,16 +144,16 @@ export const useNexus = (initialData) => {
 export const useLink = (state, path, options = {}) => {
   const { disableSync = false, stopPropagation = false } = options;
   const selector = useRef(createSelector(path)).current;
-  const [data, setState] = useState(() => selector(state.current));
+  const [data, setState] = useState(selector(state.current));
 
-  const updateListener = () => {
+  const updateLinkFromNexus = () => {
     if (!disableSync) {
       setState(selector(state.current));
     }
   };
 
   useEffect(() => {
-    updateListener();
+    updateLinkFromNexus();
     state.link.addListener(selector, updateListener);
     return () => {
       state.link.removeListener(selector, updateListener);
@@ -164,9 +164,9 @@ export const useLink = (state, path, options = {}) => {
     if (!selector.initialized) {
       selector.initialized = true;
     } else {
-      updateListener();
+      updateLinkFromNexus();
     }
-  }, [state.stateSetAt]);
+  }, [state.nexusSetAt]);
 
   const setter = (newValue) => {
     setState(newValue);
@@ -188,7 +188,7 @@ export const propagateLink = (state, link) => {
 };
 
 export const syncLink = (state, link) => {
-  const { selector } = link;
+  const { set, selector } = link;
   const newData = selector(state.current);
-  link.set(newData);
+  set(newData);
 };
