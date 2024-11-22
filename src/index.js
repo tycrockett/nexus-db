@@ -174,11 +174,12 @@ export const useLink = (state, path, options = {}) => {
   }, [disableSync, selector, state]);
 
   useEffect(() => {
+    state.link.removeListener(selector, updateLinkFromNexus);
     state.link.addListener(selector, updateLinkFromNexus);
     return () => {
       state.link.removeListener(selector, updateLinkFromNexus);
     };
-  }, []);
+  }, [updateLinkFromNexus]);
 
   return {
     data,
