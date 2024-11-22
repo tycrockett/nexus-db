@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const createSelector = (path) => {
-  const selector = (obj) => path.reduce((acc, key) => acc?.[key], obj);
+  const selector = (obj) => {
+    const value = path.reduce((acc, key) => acc?.[key], obj);
+    return JSON.parse(JSON.stringify(value));
+  };
   selector.path = path;
   return selector;
 };
@@ -145,11 +148,12 @@ export const useLink = (state, path, options = {}) => {
   const selector = useRef(createSelector(path)).current;
   const [data, setState] = useState();
 
+  if (!disableSync) {
+    const data = selector(state.current);
+    setState(data);
+  }
+
   useEffect(() => {
-    if (!disableSync) {
-      const data = selector(state.current);
-      setState(data);
-    }
     state.link.addListener(selector, updateLinkFromNexus);
     return () => {
       state.link.removeListener(selector, updateLinkFromNexus);
@@ -161,16 +165,12 @@ export const useLink = (state, path, options = {}) => {
     setState(data);
   }, [state.nexusSetAt]);
 
-  const setter = useCallback(
-    (newValue) => {
-      console.log("end", newValue);
-      setState(newValue);
-      if (!stopPropagation) {
-        state.link.setNexusWithSelector(selector, newValue);
-      }
-    },
-    [data, stopPropagation, setState, state.nexusSetAt, selector]
-  );
+  const setter = (newValue) => {
+    setState(newValue);
+    if (!stopPropagation) {
+      state.link.setNexusWithSelector(selector, newValue);
+    }
+  };
 
   return {
     data,
