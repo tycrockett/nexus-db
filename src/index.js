@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 const createSelector = (path) => {
   const selector = (obj) => path.reduce((acc, key) => acc?.[key], obj);
   selector.path = path;
-  selector.pathKey = path.join(".");
   return selector;
 };
 
@@ -85,6 +84,19 @@ class ListenerTree {
       parentNode = parentNode[key];
     }
   }
+
+  // Notify all listeners in the entire tree
+  notifyAll() {
+    const traverseAndNotify = (node) => {
+      if (!node) return;
+      (node.__listeners || []).forEach((cb) => cb(Date.now()));
+      for (const key of Object.keys(node)) {
+        if (key !== "__listeners") traverseAndNotify(node[key]);
+      }
+    };
+
+    traverseAndNotify(this.tree);
+  }
 }
 
 export const useGrainState = (initialData) => {
@@ -98,7 +110,7 @@ export const useGrainState = (initialData) => {
     } else {
       stateRef.current = valueOrFunction;
     }
-    listeners.current.notify([]);
+    listeners.current.notifyAll();
   };
 
   const setStateWithSelector = (selector, newValue) => {
@@ -108,6 +120,7 @@ export const useGrainState = (initialData) => {
 
   const addListener = (selector, callback) => {
     listeners.current.add(selector.path, callback);
+    console.log(listeners);
   };
 
   const removeListener = (selector, callback) => {
@@ -136,7 +149,6 @@ export const useGrain = (state, path, options = {}) => {
         setState(selector(state.current));
       }
     };
-
     state.segment.addListener(selector, updateListener);
     return () => {
       state.segment.removeListener(selector, updateListener);
