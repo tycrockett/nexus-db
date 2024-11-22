@@ -154,9 +154,9 @@ export const useLink = (state, path, options = {}) => {
 
   useEffect(() => {
     updateListener();
-    state.segment.addListener(selector, updateListener);
+    state.link.addListener(selector, updateListener);
     return () => {
-      state.segment.removeListener(selector, updateListener);
+      state.link.removeListener(selector, updateListener);
     };
   }, []);
 
@@ -171,7 +171,7 @@ export const useLink = (state, path, options = {}) => {
   const setter = (newValue) => {
     setState(newValue);
     if (!detach) {
-      state.segment.setStateWithSelector(selector, newValue);
+      state.link.setStateWithSelector(selector, newValue);
     }
   };
 
@@ -184,7 +184,7 @@ export const useLink = (state, path, options = {}) => {
 
 export const propagateLink = (state, link) => {
   const { data, selector } = link;
-  state.segment.setStateWithSelector(selector, data);
+  state.link.setStateWithSelector(selector, data);
 };
 
 export const syncLink = (state, link) => {
