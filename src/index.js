@@ -104,13 +104,15 @@ export const useNexus = (initialData) => {
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
+  const [stateSetAt, setStateSetAt] = useState(Date.now());
+
   const setState = (valueOrFunction) => {
     if (typeof valueOrFunction === "function") {
       stateRef.current = valueOrFunction(state);
     } else {
       stateRef.current = valueOrFunction;
     }
-    listeners.current.notifyAll();
+    setStateSetAt(Date.now());
   };
 
   const setStateWithSelector = (selector, newValue) => {
@@ -129,8 +131,9 @@ export const useNexus = (initialData) => {
 
   return {
     current: state,
-    setState,
-    segment: {
+    set: setState,
+    stateSetAt,
+    link: {
       setStateWithSelector,
       addListener,
       removeListener,
@@ -143,17 +146,27 @@ export const useLink = (state, path, options = {}) => {
   const selector = useRef(createSelector(path)).current;
   const [data, setState] = useState(() => selector(state.current));
 
+  const updateListener = () => {
+    if (!detach) {
+      setState(selector(state.current));
+    }
+  };
+
   useEffect(() => {
-    const updateListener = () => {
-      if (!detach) {
-        setState(selector(state.current));
-      }
-    };
+    updateListener();
     state.segment.addListener(selector, updateListener);
     return () => {
       state.segment.removeListener(selector, updateListener);
     };
   }, []);
+
+  useEffect(() => {
+    if (!selector.initialized) {
+      selector.initialized = true;
+    } else {
+      updateListener();
+    }
+  }, [state.stateSetAt]);
 
   const setter = (newValue) => {
     setState(newValue);
@@ -169,12 +182,12 @@ export const useLink = (state, path, options = {}) => {
   };
 };
 
-export const propagateLinkState = (state, link) => {
+export const propagateLink = (state, link) => {
   const { data, selector } = link;
   state.segment.setStateWithSelector(selector, data);
 };
 
-export const syncLinkState = (state, link) => {
+export const syncLink = (state, link) => {
   const { selector } = link;
   const newData = selector(state.current);
   link.set(newData);
