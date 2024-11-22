@@ -99,7 +99,7 @@ class ListenerTree {
   }
 }
 
-export const useHub = (initialData) => {
+export const useNexus = (initialData) => {
   const stateRef = useRef(initialData);
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
@@ -169,12 +169,12 @@ export const useLink = (state, path, options = {}) => {
   };
 };
 
-export const propagateLink = (state, link) => {
+export const propagateLinkState = (state, link) => {
   const { data, selector } = link;
   state.segment.setStateWithSelector(selector, data);
 };
 
-export const syncLink = (state, link) => {
+export const syncLinkState = (state, link) => {
   const { selector } = link;
   const newData = selector(state.current);
   link.set(newData);
