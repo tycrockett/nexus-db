@@ -148,10 +148,12 @@ export const useLink = (state, path, options = {}) => {
   const selector = useRef(createSelector(path)).current;
   const [data, setState] = useState();
 
-  if (!disableSync) {
-    const data = selector(state.current);
-    setState(data);
-  }
+  const updateLinkFromNexus = () => {
+    if (!disableSync) {
+      const data = selector(state.current);
+      setState(data);
+    }
+  };
 
   useEffect(() => {
     state.link.addListener(selector, updateLinkFromNexus);
