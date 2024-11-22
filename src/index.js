@@ -153,10 +153,9 @@ export const useLink = (state, path, options = {}) => {
   };
 
   useEffect(() => {
-    updateLinkFromNexus();
-    state.link.addListener(selector, updateListener);
+    state.link.addListener(selector, updateLinkFromNexus);
     return () => {
-      state.link.removeListener(selector, updateListener);
+      state.link.removeListener(selector, updateLinkFromNexus);
     };
   }, []);
 
