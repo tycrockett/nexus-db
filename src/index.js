@@ -179,25 +179,3 @@ export const syncLink = (state, link) => {
   const newData = selector(state.current);
   link.set(newData);
 };
-
-export const createLink = (obj) => {
-  const path = [];
-
-  function traverse(current, currentPath) {
-    if (Array.isArray(current)) {
-      path.push(...currentPath);
-      return true;
-    }
-    if (typeof current !== "object" || current === null) return false;
-
-    for (const key in current) {
-      if (traverse(current[key], [...currentPath, key])) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  traverse(obj, []);
-  return path;
-};
