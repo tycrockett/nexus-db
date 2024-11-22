@@ -142,12 +142,12 @@ export const useNexus = (initialData) => {
 };
 
 export const useLink = (state, path, options = {}) => {
-  const { detach = false } = options;
+  const { disableSync = false, stopPropagation = false } = options;
   const selector = useRef(createSelector(path)).current;
   const [data, setState] = useState(() => selector(state.current));
 
   const updateListener = () => {
-    if (!detach) {
+    if (!disableSync) {
       setState(selector(state.current));
     }
   };
@@ -170,7 +170,7 @@ export const useLink = (state, path, options = {}) => {
 
   const setter = (newValue) => {
     setState(newValue);
-    if (!detach) {
+    if (!stopPropagation) {
       state.link.setNexusWithSelector(selector, newValue);
     }
   };
