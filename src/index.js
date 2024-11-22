@@ -148,9 +148,10 @@ export const useLink = (state, path, options = {}) => {
 
   const updateLinkFromNexus = useCallback(() => {
     if (!disableSync) {
-      setState(selector(state.current));
+      const data = selector(state.current);
+      setState(data);
     }
-  }, [setState, disableSync]);
+  }, [setState, disableSync, state.nexusSetAt]);
 
   useEffect(() => {
     state.link.addListener(selector, updateLinkFromNexus);
