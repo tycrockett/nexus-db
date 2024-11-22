@@ -174,7 +174,12 @@ export const useLink = (state, path, options = {}) => {
         state.link.setNexusWithSelector(selector, newValue);
       }
     },
-    [stopPropagation, setState, state.nexusSetAt]
+    [
+      stopPropagation,
+      setState,
+      state.link.setNexusWithSelector,
+      state.nexusSetAt,
+    ]
   );
 
   return {
