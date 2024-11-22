@@ -122,7 +122,6 @@ export const useNexus = (initialData) => {
 
   const addListener = (selector, callback) => {
     listeners.current.add(selector.path, callback);
-    console.log(listeners);
   };
 
   const removeListener = (selector, callback) => {
@@ -175,7 +174,7 @@ export const useLink = (state, path, options = {}) => {
         state.link.setNexusWithSelector(selector, newValue);
       }
     },
-    [stopPropagation, setState]
+    [stopPropagation, setState, state.nexusSetAt]
   );
 
   return {
