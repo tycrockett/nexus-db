@@ -160,6 +160,7 @@ export const useLink = (state, path, options = {}) => {
     if (!selector.initialized) {
       selector.initialized = true;
     } else {
+      console.log("hi");
       const data = selector(state.current);
       setState(data);
     }
@@ -167,6 +168,7 @@ export const useLink = (state, path, options = {}) => {
 
   const setter = useCallback(
     (newValue) => {
+      console.log("end", newValue);
       setState(newValue);
       if (!stopPropagation) {
         state.link.setNexusWithSelector(selector, newValue);
