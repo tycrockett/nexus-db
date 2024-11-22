@@ -168,7 +168,7 @@ export const useLink = (state, path, options = {}) => {
 
   const updateLinkFromNexus = useCallback(() => {
     if (!disableSync) {
-      const newData = selector(state.current);
+      const newData = () => selector(state.current);
       setData(newData);
     }
   }, [disableSync, selector, state]);
