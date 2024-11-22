@@ -142,7 +142,7 @@ export const useGrain = (state, path, options = {}) => {
   const { detach = false } = options;
   const selector = useRef(createSelector(path)).current;
   const [data, setState] = useState(() => selector(state.current));
-
+  console.log(data);
   useEffect(() => {
     const updateListener = () => {
       if (!detach) {
@@ -157,8 +157,13 @@ export const useGrain = (state, path, options = {}) => {
 
   const setter = (newValue) => {
     setState(newValue);
-    state.segment.setStateWithSelector(selector, newValue);
+    if (!detach) {
+      state.segment.setStateWithSelector(selector, newValue);
+    }
   };
 
-  return [data, setter];
+  const returnValues = [data, setter];
+  returnValues.selector = selector;
+
+  return returnValues;
 };
