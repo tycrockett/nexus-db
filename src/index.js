@@ -159,12 +159,15 @@ export const useLink = (state, path, options = {}) => {
   const selector = useRef(createSelector(path)).current;
   const [data, setData] = useState(() => selector(state.current));
 
-  const setter = (newValue) => {
-    setData(newValue);
-    if (!stopPropagation) {
-      state.link.setNexusWithSelector(selector, newValue);
-    }
-  };
+  const setter = useCallback(
+    (newValue) => {
+      setData(newValue);
+      if (!stopPropagation) {
+        state.link.setNexusWithSelector(selector, newValue);
+      }
+    },
+    [setData]
+  );
 
   const updateLinkFromNexus = useCallback(() => {
     if (!disableSync) {
