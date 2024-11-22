@@ -143,7 +143,7 @@ export const useNexus = (initialData) => {
 export const useLink = (state, path, options = {}) => {
   const { disableSync = false, stopPropagation = false } = options;
   const selector = useRef(createSelector(path)).current;
-  const [data, setState] = useState(selector(state.current));
+  const [data, setState] = useState();
 
   useEffect(() => {
     if (!disableSync) {
@@ -157,14 +157,9 @@ export const useLink = (state, path, options = {}) => {
   }, []);
 
   useEffect(() => {
-    if (!selector.initialized) {
-      selector.initialized = true;
-    } else {
-      console.log("hi");
-      const data = selector(state.current);
-      setState(data);
-    }
-  }, [state.nexusSetAt, setState]);
+    const data = selector(state.current);
+    setState(data);
+  }, [state.nexusSetAt]);
 
   const setter = useCallback(
     (newValue) => {
