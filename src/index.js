@@ -99,7 +99,7 @@ class ListenerTree {
   }
 }
 
-export const useGrainState = (initialData) => {
+export const useHub = (initialData) => {
   const stateRef = useRef(initialData);
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
@@ -138,7 +138,7 @@ export const useGrainState = (initialData) => {
   };
 };
 
-export const useGrain = (state, path, options = {}) => {
+export const useLink = (state, path, options = {}) => {
   const { detach = false } = options;
   const selector = useRef(createSelector(path)).current;
   const [data, setState] = useState(() => selector(state.current));
@@ -169,18 +169,18 @@ export const useGrain = (state, path, options = {}) => {
   };
 };
 
-export const propagateGrain = (state, grain) => {
-  const { data, selector } = grain;
+export const propagateLink = (state, link) => {
+  const { data, selector } = link;
   state.segment.setStateWithSelector(selector, data);
 };
 
-export const syncGrain = (state, grain) => {
-  const { selector } = grain;
+export const syncLink = (state, link) => {
+  const { selector } = link;
   const newData = selector(state.current);
-  grain.set(newData);
+  link.set(newData);
 };
 
-export const createSeed = (obj) => {
+export const createLink = (obj) => {
   const path = [];
 
   function traverse(current, currentPath) {
