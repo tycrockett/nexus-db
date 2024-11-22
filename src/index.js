@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const createSelector = (path) => {
   const selector = (obj) => {
-    const value = path.reduce((acc, key) => acc?.[key], obj);
-    return JSON.parse(JSON.stringify(value));
+    return path.reduce((acc, key) => acc?.[key], obj);
   };
   selector.path = path;
   return selector;
@@ -88,13 +87,28 @@ class ListenerTree {
     }
   }
 
-  // Notify all listeners in the entire tree
   notifyAll() {
     const traverseAndNotify = (node) => {
-      if (!node) return;
-      (node.__listeners || []).forEach((cb) => cb(Date.now()));
+      if (!node || typeof node !== "object") return;
+
+      // Notify listeners
+      if (Array.isArray(node.__listeners)) {
+        node.__listeners.forEach((cb) => {
+          if (typeof cb === "function") {
+            try {
+              cb(Date.now());
+            } catch (err) {
+              console.error("Callback error:", err);
+            }
+          }
+        });
+      }
+
+      // Traverse child nodes
       for (const key of Object.keys(node)) {
-        if (key !== "__listeners") traverseAndNotify(node[key]);
+        if (key !== "__listeners" && typeof node[key] === "object") {
+          traverseAndNotify(node[key]);
+        }
       }
     };
 
@@ -107,15 +121,13 @@ export const useNexus = (initialData) => {
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
-  const [nexusSetAt, setNexusAt] = useState(Date.now());
-
   const setState = (valueOrFunction) => {
     if (typeof valueOrFunction === "function") {
       stateRef.current = valueOrFunction(state);
     } else {
       stateRef.current = valueOrFunction;
     }
-    setNexusAt(Date.now());
+    listeners.current.notifyAll();
   };
 
   const setNexusWithSelector = (selector, newValue) => {
@@ -134,7 +146,6 @@ export const useNexus = (initialData) => {
   return {
     current: state,
     set: setState,
-    nexusSetAt,
     link: {
       setNexusWithSelector,
       addListener,
@@ -148,6 +159,13 @@ export const useLink = (state, path, options = {}) => {
   const selector = useRef(createSelector(path)).current;
   const [data, setData] = useState();
 
+  const setter = (newValue) => {
+    setData(newValue);
+    if (!stopPropagation) {
+      state.link.setNexusWithSelector(selector, newValue);
+    }
+  };
+
   const updateLinkFromNexus = () => {
     if (!disableSync) {
       const data = selector(state.current);
@@ -156,28 +174,13 @@ export const useLink = (state, path, options = {}) => {
   };
 
   useEffect(() => {
+    const data = selector(state.current);
+    setData(data);
     state.link.addListener(selector, updateLinkFromNexus);
     return () => {
       state.link.removeListener(selector, updateLinkFromNexus);
     };
   }, []);
-
-  useEffect(() => {
-    if (!selector.initialized) {
-      selector.initialized = true;
-      updateLinkFromNexus();
-    } else {
-      const data = selector(state.current);
-      setData(data);
-    }
-  }, [state.nexusSetAt]);
-
-  const setter = (newValue) => {
-    setData(newValue);
-    if (!stopPropagation) {
-      state.link.setNexusWithSelector(selector, newValue);
-    }
-  };
 
   return {
     data,
