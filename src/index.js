@@ -155,6 +155,7 @@ export const useNexus = (initialData) => {
       addListener,
       removeListener,
       nexusUpdateAt,
+      logListeners: () => console.log(listeners.current),
     },
   };
 };
