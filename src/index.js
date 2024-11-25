@@ -129,7 +129,6 @@ export const useNexus = (initialData) => {
     } else {
       stateRef.current = valueOrFunction;
     }
-    // listeners.current.notifyAll();
     setNexusUpdateAt(Date.now());
   };
 
