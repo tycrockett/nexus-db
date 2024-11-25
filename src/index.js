@@ -22,6 +22,26 @@ const dataSetter = (object, selector, newValue) => {
   current[link[link.length - 1]] = newValue;
 };
 
+const flattenObject = (obj, parentKey = "", separator = ".") => {
+  let result = {};
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const fullKey = parentKey ? `${parentKey}${separator}${key}` : key;
+      if (
+        typeof obj[key] === "object" &&
+        obj[key] !== null &&
+        !Array.isArray(obj[key])
+      ) {
+        Object.assign(result, flattenObject(obj[key], fullKey, separator));
+      } else {
+        result[fullKey] = obj[key];
+      }
+    }
+  }
+
+  return result;
+};
 class ListenerTree {
   constructor() {
     this.tree = {};
@@ -118,19 +138,25 @@ class ListenerTree {
   }
 }
 
-export const useNexus = (initialData) => {
-  const stateRef = useRef(initialData);
+export const useNexus = (initialData, options = {}) => {
+  const { flatten = true } = options;
+  const stateRef = useRef(() => flattenObject(initialData));
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
   const [nexusUpdateAt, setNexusUpdateAt] = useState(null);
 
   const setState = (valueOrFunction) => {
+    let next = {};
     if (typeof valueOrFunction === "function") {
-      stateRef.current = valueOrFunction(state);
+      next = valueOrFunction(state);
     } else {
-      stateRef.current = valueOrFunction;
+      next = valueOrFunction;
     }
+    if (flatten) {
+      next = flattenObject(next);
+    }
+    stateRef.current = next;
     setNexusUpdateAt(Date.now());
   };
 
