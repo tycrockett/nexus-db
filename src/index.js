@@ -1,25 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as uuid from "uuid";
 
-const createSelector = (path) => {
+const createSelector = (link) => {
   const selector = (obj) => {
-    return path.reduce((acc, key) => acc?.[key], obj);
+    return link.reduce((acc, key) => acc?.[key], obj);
   };
   selector.id = uuid.v4();
-  selector.path = path;
+  selector.link = link;
   return selector;
 };
 
 const dataSetter = (object, selector, newValue) => {
-  const path = selector.path;
-  if (!path) {
-    throw new Error('Selector must have a "path" property for setting.');
+  const link = selector.link;
+  if (!link) {
+    throw new Error('Selector must have a "link" property for setting.');
   }
   let current = object;
-  for (let i = 0; i < path.length - 1; i++) {
-    current = current[path[i]];
+  for (let i = 0; i < link.length - 1; i++) {
+    current = current[link[i]];
   }
-  current[path[path.length - 1]] = newValue;
+  current[link[link.length - 1]] = newValue;
 };
 
 class ListenerTree {
@@ -27,9 +27,9 @@ class ListenerTree {
     this.tree = {};
   }
 
-  add(path, callback) {
+  add(link, callback) {
     let node = this.tree;
-    for (const key of path) {
+    for (const key of link) {
       if (!node[key]) {
         node[key] = { __listeners: [] };
       }
@@ -38,11 +38,11 @@ class ListenerTree {
     node.__listeners.push(callback);
   }
 
-  remove(path, callback) {
+  remove(link, callback) {
     let node = this.tree;
     const stack = [];
-    for (const key of path) {
-      if (!node[key]) return; // Path doesn't exist
+    for (const key of link) {
+      if (!node[key]) return; // link doesn't exist
       stack.push([node, key]);
       node = node[key];
     }
@@ -62,7 +62,7 @@ class ListenerTree {
     }
   }
 
-  notify(path) {
+  notify(link) {
     const notifyCallbacks = (node) => {
       if (!node) return;
       (node.__listeners || []).forEach((cb) => cb(Date.now()));
@@ -71,17 +71,17 @@ class ListenerTree {
       }
     };
 
-    // Notify exact path
+    // Notify exact link
     let node = this.tree;
-    for (const key of path) {
+    for (const key of link) {
       if (!node[key]) break;
       node = node[key];
     }
     notifyCallbacks(node);
 
-    // Notify parent paths
+    // Notify parent links
     let parentNode = this.tree;
-    for (const key of path) {
+    for (const key of link) {
       if (parentNode.__listeners) {
         parentNode.__listeners.forEach((cb) => cb(Date.now()));
       }
@@ -136,15 +136,15 @@ export const useNexus = (initialData) => {
 
   const setNexusWithSelector = (selector, newValue) => {
     dataSetter(state, selector, newValue);
-    listeners.current.notify(selector.path);
+    listeners.current.notify(selector.link);
   };
 
   const addListener = (selector, callback) => {
-    listeners.current.add(selector.path, callback);
+    listeners.current.add(selector.link, callback);
   };
 
   const removeListener = (selector, callback) => {
-    listeners.current.remove(selector.path, callback);
+    listeners.current.remove(selector.link, callback);
   };
 
   return {
@@ -162,12 +162,12 @@ export const useNexus = (initialData) => {
 
 export const useLink = (state, options = {}) => {
   const {
-    path = [],
+    link = [],
     initialData = null,
     subscribed = true,
     muted = false,
   } = options;
-  const selector = useRef(createSelector(path)).current;
+  const selector = useRef(createSelector(link)).current;
   const [data, setData] = useState(
     () => selector(state.current) || initialData
   );
@@ -207,7 +207,7 @@ export const useLink = (state, options = {}) => {
   }, [subscribed]);
 
   const updateSelector = () => {
-    selector.current = createSelector(path);
+    selector.current = createSelector(link);
     updateLinkKey();
   };
 
