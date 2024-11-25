@@ -140,7 +140,7 @@ class ListenerTree {
 
 export const useNexus = (initialData, options = {}) => {
   const { flatten = true } = options;
-  const stateRef = useRef(() => flattenObject(initialData));
+  const stateRef = useRef(flattenObject(initialData));
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
