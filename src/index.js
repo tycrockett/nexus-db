@@ -135,8 +135,6 @@ export const useNexus = (initialData) => {
   };
 
   const setNexusWithSelector = (selector, newValue) => {
-    console.log("NEXUS SELECTOR SET");
-    console.log(selector);
     dataSetter(state, selector, newValue);
     listeners.current.notify(selector.path);
   };
@@ -175,7 +173,6 @@ export const useLink = (state, path, options = {}) => {
 
   const setter = useCallback(
     (newValue) => {
-      console.log("Setting new value:", newValue, "Path:", selector.path);
       setData(newValue);
       if (!stopPropagation) {
         state.link.setNexusWithSelector(selector, newValue);
@@ -214,8 +211,8 @@ export const useLink = (state, path, options = {}) => {
     set: setter,
     setData,
     metadata: {
-      updateLinkKey,
-      linkKey,
+      updateLinkKey: updateKey,
+      key: linkKey,
       selector,
     },
   };
