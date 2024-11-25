@@ -188,7 +188,12 @@ export const useLink = (state, path, options = {}) => {
     };
   }, [updateLinkFromNexus]);
 
+  const updateSelector = () => {
+    selector.current = createSelector(path);
+  };
+
   useEffect(() => {
+    updateSelector();
     updateLinkFromNexus();
   }, [state?.link?.nexusUpdateAt]);
 
