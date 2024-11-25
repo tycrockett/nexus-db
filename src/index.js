@@ -160,10 +160,17 @@ export const useNexus = (initialData) => {
   };
 };
 
-export const useLink = (state, path, options = {}) => {
-  const { subscribed = true, muted = false } = options;
+export const useLink = (state, options = {}) => {
+  const {
+    path = [],
+    initialData = null,
+    subscribed = true,
+    muted = false,
+  } = options;
   const selector = useRef(createSelector(path)).current;
-  const [data, setData] = useState(() => selector(state.current));
+  const [data, setData] = useState(
+    () => selector(state.current) || initialData
+  );
   const [linkKey, setLinkKey] = useState(selector.id);
 
   const updateLinkKey = () => {
