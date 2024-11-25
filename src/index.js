@@ -197,14 +197,14 @@ export const useLink = (state, options = {}) => {
   }, [subscribed, selector, state.current]);
 
   useEffect(() => {
-    // state.link.removeListener(selector, updateLinkFromNexus);
+    state.link.removeListener(selector, updateLinkFromNexus);
     if (subscribed) {
       state.link.addListener(selector, updateLinkFromNexus);
     }
     return () => {
       state.link.removeListener(selector, updateLinkFromNexus);
     };
-  }, [subscribed]);
+  }, [subscribed, updateLinkFromNexus]);
 
   const updateSelector = () => {
     selector.current = createSelector(link);
