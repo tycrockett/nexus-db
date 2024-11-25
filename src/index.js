@@ -189,6 +189,7 @@ export const useLink = (state, path, options = {}) => {
   }, [updateLinkFromNexus]);
 
   const updateSelector = () => {
+    state.link.removeListener(selector, updateLinkFromNexus);
     selector.current = createSelector(path);
   };
 
