@@ -211,7 +211,7 @@ export const useLink = (state, path, options = {}) => {
     set: setter,
     setData,
     metadata: {
-      updateLinkKey: updateKey,
+      updateKey: updateLinkKey,
       key: linkKey,
       selector,
     },
