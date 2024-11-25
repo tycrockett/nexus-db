@@ -46,7 +46,7 @@ class ListenerTree {
       stack.push([node, key]);
       node = node[key];
     }
-    node.__listeners = node.__listeners?.filter((cb) => cb !== callback) || [];
+    node.__listeners = node.__listeners?.filter((cb) => cb !== callback);
 
     // Clean up empty nodes
     while (stack.length) {
