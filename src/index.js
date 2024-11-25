@@ -121,13 +121,16 @@ export const useNexus = (initialData) => {
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
+  const [nexusUpdateAt, setNexusUpdateAt] = useState(null);
+
   const setState = (valueOrFunction) => {
     if (typeof valueOrFunction === "function") {
       stateRef.current = valueOrFunction(state);
     } else {
       stateRef.current = valueOrFunction;
     }
-    listeners.current.notifyAll();
+    // listeners.current.notifyAll();
+    setNexusUpdateAt(Date.now());
   };
 
   const setNexusWithSelector = (selector, newValue) => {
@@ -150,6 +153,7 @@ export const useNexus = (initialData) => {
       setNexusWithSelector,
       addListener,
       removeListener,
+      nexusUpdateAt,
     },
   };
 };
@@ -183,6 +187,10 @@ export const useLink = (state, path, options = {}) => {
       state.link.removeListener(selector, updateLinkFromNexus);
     };
   }, [updateLinkFromNexus]);
+
+  useEffect(() => {
+    updateLinkFromNexus();
+  }, [state?.link?.nexusUpdateAt]);
 
   return {
     data,
