@@ -155,7 +155,6 @@ export const useNexus = (initialData) => {
       addListener,
       removeListener,
       nexusUpdateAt,
-      getNexusKey,
     },
   };
 };
