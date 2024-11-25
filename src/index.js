@@ -161,7 +161,7 @@ export const useNexus = (initialData) => {
 };
 
 export const useLink = (state, path, options = {}) => {
-  const { disableSync = false, stopPropagation = false } = options;
+  const { subscribed = true, muted = false } = options;
   const selector = useRef(createSelector(path)).current;
   const [data, setData] = useState(() => selector(state.current));
   const [linkKey, setLinkKey] = useState(selector.id);
@@ -175,27 +175,29 @@ export const useLink = (state, path, options = {}) => {
   const setter = useCallback(
     (newValue) => {
       setData(newValue);
-      if (!stopPropagation) {
+      if (!muted) {
         state.link.setNexusWithSelector(selector, newValue);
       }
     },
-    [state.current, selector, stopPropagation]
+    [state.current, selector, muted]
   );
 
   const updateLinkFromNexus = useCallback(() => {
-    if (!disableSync) {
+    if (subscribed) {
       const newData = () => selector(state.current);
       setData(newData);
     }
-  }, [disableSync, selector, state.current]);
+  }, [subscribed, selector, state.current]);
 
   useEffect(() => {
     state.link.removeListener(selector, updateLinkFromNexus);
-    state.link.addListener(selector, updateLinkFromNexus);
+    if (subscribed) {
+      state.link.addListener(selector, updateLinkFromNexus);
+    }
     return () => {
       state.link.removeListener(selector, updateLinkFromNexus);
     };
-  }, [updateLinkFromNexus]);
+  }, [updateLinkFromNexus, subscribed]);
 
   const updateSelector = () => {
     selector.current = createSelector(path);
