@@ -25,5 +25,8 @@
   },
   "peerDependencies": {
     "react": "^18.0.0"
+  },
+  "dependencies": {
+    "uuid": "^11.0.3"
   }
 }

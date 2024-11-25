@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import * as uuid from "uuid";
 
 const createSelector = (path) => {
   const selector = (obj) => {
     return path.reduce((acc, key) => acc?.[key], obj);
   };
+  selector.id = uuid.v4();
   selector.path = path;
   return selector;
 };
@@ -153,6 +155,7 @@ export const useNexus = (initialData) => {
       addListener,
       removeListener,
       nexusUpdateAt,
+      getNexusKey,
     },
   };
 };
@@ -161,6 +164,13 @@ export const useLink = (state, path, options = {}) => {
   const { disableSync = false, stopPropagation = false } = options;
   const selector = useRef(createSelector(path)).current;
   const [data, setData] = useState(() => selector(state.current));
+  const [linkKey, setLinkKey] = useState(selector.id);
+
+  const updateLinkKey = () => {
+    const time = Date.now();
+    const key = `${selector.id}-${time}`;
+    setLinkKey(key);
+  };
 
   const setter = useCallback(
     (newValue) => {
@@ -188,8 +198,8 @@ export const useLink = (state, path, options = {}) => {
   }, [updateLinkFromNexus]);
 
   const updateSelector = () => {
-    state.link.removeListener(selector, updateLinkFromNexus);
     selector.current = createSelector(path);
+    updateLinkKey();
   };
 
   useEffect(() => {
@@ -200,17 +210,21 @@ export const useLink = (state, path, options = {}) => {
   return {
     data,
     set: setter,
-    selector,
+    metadata: {
+      updateLinkKey,
+      linkKey,
+      selector,
+    },
   };
 };
 
 export const propagateLink = (state, link) => {
-  const { data, selector } = link;
-  state.link.setNexusWithSelector(selector, data);
+  const { data, metadata } = link;
+  state.link.setNexusWithSelector(metadata?.selector, data);
 };
 
 export const syncLink = (state, link) => {
-  const { set, selector } = link;
-  const newData = selector(state.current);
+  const { set, metadata } = link;
+  const newData = metadata?.selector(state.current);
   set(newData);
 };
