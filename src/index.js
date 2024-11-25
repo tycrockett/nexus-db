@@ -171,15 +171,12 @@ export const useLink = (state, path, options = {}) => {
     setLinkKey(key);
   };
 
-  const setter = useCallback(
-    (newValue) => {
-      setData(newValue);
-      if (!stopPropagation) {
-        state.link.setNexusWithSelector(selector, newValue);
-      }
-    },
-    [setData]
-  );
+  const setter = useCallback((newValue) => {
+    setData(newValue);
+    if (!stopPropagation) {
+      state.link.setNexusWithSelector(selector, newValue);
+    }
+  }, []);
 
   const updateLinkFromNexus = useCallback(() => {
     if (!disableSync) {
@@ -209,6 +206,7 @@ export const useLink = (state, path, options = {}) => {
   return {
     data,
     set: setter,
+    setData,
     metadata: {
       updateLinkKey,
       linkKey,
