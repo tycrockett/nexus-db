@@ -256,7 +256,7 @@ export const useLinkState = (state, options = {}) => {
   };
 };
 
-export const propagateLink = (state, link) => {
+export const sendLink = (state, link) => {
   const { data, metadata } = link;
   state.link.setNexusWithSelector(metadata?.selector, data);
 };
@@ -284,7 +284,7 @@ export const useLink = (options = {}) => {
 export const useLinkKit = () => {
   const nexus = useContext(NexusContext);
   return {
-    propagate: (link) => propagateLink(nexus, link),
+    send: (link) => sendLink(nexus, link),
     sync: (link) => syncLink(nexus, link),
   };
 };
