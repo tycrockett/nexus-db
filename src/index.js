@@ -276,8 +276,5 @@ export const Nexus = ({ data, children }) => {
 
 export const useLink = (options = {}) => {
   const nexus = React.useContext(NexusContext);
-  if (!nexus) {
-    throw new Error("useLink must be used within a Nexus provider.");
-  }
   return useLinkState(nexus, options);
 };
