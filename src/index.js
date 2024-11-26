@@ -277,7 +277,7 @@ const NexusContext = createContext(null);
 export const Nexus = ({ data, children }) => {
   const nexus = useNexus(data);
   return (
-    <NexusContext.Provider nexus={nexus}>{children}</NexusContext.Provider>
+    <NexusContext.Provider value={nexus}>{children}</NexusContext.Provider>
   );
 };
 
