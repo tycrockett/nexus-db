@@ -284,7 +284,7 @@ export const useLink = (options = {}) => {
 export const useLinkKit = () => {
   const nexus = useContext(NexusContext);
   return {
-    propageLink: (link) => propagateLink(nexus, link),
-    syncLink: (link) => syncLink(nexus, link),
+    propagate: (link) => propagateLink(nexus, link),
+    sync: (link) => syncLink(nexus, link),
   };
 };
