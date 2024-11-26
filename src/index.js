@@ -186,7 +186,7 @@ export const useNexus = (initialData, options = {}) => {
   };
 };
 
-export const useLink = (state, options = {}) => {
+export const useLinkState = (state, options = {}) => {
   const {
     link = [],
     initialData = null,
@@ -263,4 +263,21 @@ export const syncLink = (state, link) => {
   const { set, metadata } = link;
   const newData = metadata?.selector(state.current);
   set(newData);
+};
+
+const NexusContext = React.createContext(null);
+
+export const Nexus = ({ data, children }) => {
+  const nexus = useNexus(data);
+  return (
+    <NexusContext.Provider nexus={nexus}>{children}</NexusContext.Provider>
+  );
+};
+
+export const useLink = (options = {}) => {
+  const nexus = React.useContext(NexusContext);
+  if (!nexus) {
+    throw new Error("useLink must be used within a Nexus provider.");
+  }
+  return useLinkState(nexus, options);
 };
