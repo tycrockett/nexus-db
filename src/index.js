@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import * as uuid from "uuid";
 
 const createSelector = (link) => {
@@ -265,7 +272,7 @@ export const syncLink = (state, link) => {
   set(newData);
 };
 
-const NexusContext = React.createContext(null);
+const NexusContext = createContext(null);
 
 export const Nexus = ({ data, children }) => {
   const nexus = useNexus(data);
@@ -275,6 +282,6 @@ export const Nexus = ({ data, children }) => {
 };
 
 export const useLink = (options = {}) => {
-  const nexus = React.useContext(NexusContext);
+  const nexus = useContext(NexusContext);
   return useLinkState(nexus, options);
 };
