@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowJs": true, // To allow .js/.jsx files
+    "declaration": true, // Enables DTS generation
+    "emitDeclarationOnly": true, // Ensures only DTS files are generated during DTS builds
+    "skipLibCheck": true, // Skips type checking for declaration files
+    "esModuleInterop": true, // Ensures compatibility with ES modules
+    "moduleResolution": "node",
+    "outDir": "dist", // Output directory
+    "resolveJsonModule": true,
+    "strict": true,
+    "target": "ESNext"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

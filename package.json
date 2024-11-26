@@ -6,7 +6,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.js --dts --format esm,cjs"
+    "build": "tsup src/index.jsx --dts --format esm,cjs"
   },
   "keywords": [
     "react",

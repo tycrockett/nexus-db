@@ -146,8 +146,7 @@ class ListenerTree {
 }
 
 export const useNexus = (initialData, options = {}) => {
-  const { flatten = true } = options;
-  const stateRef = useRef(flattenObject(initialData));
+  const stateRef = useRef(initialData);
   const listeners = useRef(new ListenerTree());
   const state = stateRef.current;
 
@@ -159,9 +158,6 @@ export const useNexus = (initialData, options = {}) => {
       next = valueOrFunction(state);
     } else {
       next = valueOrFunction;
-    }
-    if (flatten) {
-      next = flattenObject(next);
     }
     stateRef.current = next;
     setNexusUpdateAt(Date.now());
@@ -188,7 +184,6 @@ export const useNexus = (initialData, options = {}) => {
       addListener,
       removeListener,
       nexusUpdateAt,
-      logListeners: () => console.log(listeners.current),
     },
   };
 };
